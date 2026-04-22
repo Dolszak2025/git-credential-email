@@ -56,8 +56,8 @@ curl -L "https://github.com/AdityaGarg8/git-credential-email/releases/download/d
 	&& echo "deb [signed-by=/etc/apt/trusted.gpg.d/git-credential-email.gpg] \
 	https://github.com/AdityaGarg8/git-credential-email/releases/download/debian ./" \
 	| sudo tee -a /etc/apt/sources.list.d/git-credential-email.list \
-	&& sudo apt-get update \
-	&& sudo apt-get install -y git-credential-gmail git-credential-outlook git-credential-yahoo git-credential-aol git-msgraph git-protonmail
+	&& sudo apt update \
+	&& sudo apt install -y git-credential-gmail git-credential-outlook git-credential-yahoo git-credential-aol git-msgraph git-protonmail
 ```
 
 #### Fedora
@@ -132,9 +132,11 @@ curl -L -o %temp%\cred.zip https://github.com/AdityaGarg8/git-credential-email/r
 tar -xf %temp%\cred.zip -C "%ProgramFiles%\Git\mingw64\libexec\git-core"
 ```
 
+For `git-protonmail`, two Windows packages are available: 1. `git-protonmail_win64.zip` and 2. `git-protonmail_lite_win64.zip`. The lite version does not contain `PyQt6-WebEngine` to help solving CAPTCHA, but is also much smaller in size. See [this section](#solving-captcha-while-authenticating-in-proton-mail) to know more about CAPTCHA in Proton Mail.
+
 ## Setting up OAuth 2.0 client credentials
 
-**You can skip this section if you are using Proton Mail**
+**You can skip this section if you are using Proton Mail.**
 
 In order to use OAuth2.0, you need to provide an OAuth 2.0 `client_id` and a `client_secret` (secret not needed in Outlook) to allow the helper to authenticate with email servers on your behalf.
 
@@ -143,6 +145,8 @@ If not configured, it will use Thunderbird's `client_id` and `client_secret` by 
 The helpers include the client credentials of the following popular email clients:
 
 - Thunderbird
+- K-9 Mail
+- FairEmail
 - GNOME Evolution (only available for Gmail, Outlook and Yahoo)
 - GNOME Online Accounts (only available for Gmail and Outlook)
 
@@ -280,21 +284,20 @@ Microsoft Graph API can be used instead of Outlook's SMTP server to send emails.
 
 There is a high chance that you will be asked to solve a CAPTCHA when you try to authenticate for Proton Mail. The on-screen instructions should be followed while solving the CAPTCHA.
 
-For an easier CAPTCHA solving experience, you can install either `PyQt6-WebEngine` or `OpenCV`.
+For an easier CAPTCHA solving experience, you can install either `PyQt6-WebEngine` or `PySide6`.
 
-`PyQt6-WebEngine` will open a dedicated broswer window for solving CAPTCHA for you to solve and send the solved CAPTCHA to the credential helper. It occupies around 100-200MBs depending on your OS.
+Both `PyQt6-WebEngine` and `PySide6` will open a dedicated broswer window for solving CAPTCHA for you to solve and send the solved CAPTCHA to the credential helper. Each occupies around 100-300MBs depending on your OS. You just need to install any one out of both of them.
 
-`OpenCV` is more advanced and can automatically solve the CAPTCHA 99% times, without you needing to solve it at all! But it also occupies around 600MBs. An alternate is `opencv-python-headless` available using `pip` that is lighter, and is the best option for headless systems. It is not available if you are using apt/dnf/brew to install the helper. If you are using a [Windows binary](#windows), `opencv-python-headless` is bundled by default.
+You can install it by running:
 
-I would recommend installing `PyQt6-WebEngine` if you are on a system with GUI and `OpenCV` for headless systems.
-
-You can install them by running (modify the commands accordingly if you want to install only one of them):
-
-- For all platforms: `pip install PyQt6-WebEngine opencv-python`
-- If you have a headless system: `pip install opencv-python-headless` (PyQt6-WebEngine is a GUI app, so will not work in headless systems)
-- Ubuntu/Debian: `sudo apt-get install -y python3-pyqt6.qtwebengine python3-opencv`
-- Fedora: `sudo dnf install -y python-pyqt6-webengine python-opencv`
-- macOS: `brew install pyqt@6 opencv`
+| Platform            | PyQt6 WebEngine                                  | PySide6                                                  |
+|---------------------|--------------------------------------------------|----------------------------------------------------------|
+| All platforms       | `pip install PyQt6-WebEngine`                    | `pip install PySide6`                                    |
+| Ubuntu/Debian       | `sudo apt install -y python3-pyqt6.qtwebengine`  | `sudo apt install -y python3-pyside6.qtwebenginewidgets` |
+| Fedora              | `sudo dnf install -y python-pyqt6-webengine`     | `sudo dnf install -y python-pyside6`                     |
+| Arch Linux          | `sudo pacman -Sy python-pyqt6-webengine`         | `sudo pacman -Sy pyside6 qt6-webengine`                  |
+| OpenSUSE Tumbleweed | `sudo zypper install -y python3-PyQt6-WebEngine` | `sudo zypper install -y python3-pyside6`                 |
+| macOS (Homebrew)    | `brew install pyqt@6`                            | `brew install pyside@6`                                  |
 
 ## Usage
 
